@@ -38,7 +38,7 @@ class Edge:
         elif NODE_TYPE_P in start_node.node_type and NODE_TYPE_P in end_node.node_type:
             self.pip_type = PIP_TYPE_II
         else:
-            assert "供水方向错误"
+            print("供水方向错误,start_node = {},end_node = {}".format(start_node.index, end_node.index))
         self.distance = compute_distance(start_node, end_node)
 
 
@@ -183,20 +183,10 @@ def compute_length(edges):
     return len_pip_type_I, len_pip_type_II, len_pip_type_I + len_pip_type_II
 
 
-def main():
-    nodes = read_data()
-    distance_matrix = build_distance_matrix(nodes)
-    print("max = {}".format(distance_matrix))
-    for node in nodes:
-        print(node.index, node.node_type, node.node_x, node.node_y)
-
-    # Prim算法构建生成树
-    is_chosen = np.zeros(shape=(len(nodes)))
+def prime(nodes, distance_matrix, is_chosen):
     # 选择供水中心作为开始节点
     edges = []
-    is_chosen[0] = 1
     # 并不是所有node都被选中
-    times = 0
     print("distance_matrix{}".format(distance_matrix))
     while not is_chosen.all():
         print("is_chosen = {}".format(is_chosen.sum()))
@@ -209,9 +199,33 @@ def main():
         for index in chosen_index:
             distance_matrix[index, end] = MAX_LENGTH
             distance_matrix[end, index] = MAX_LENGTH
+    return edges
 
-    draw_line(nodes, edges)
-    i, ii, sum_ = compute_length(edges)
+
+def main():
+    nodes = read_data()
+    pre_node = []
+    for node in nodes:
+        if NODE_TYPE_P in node.node_type:
+            continue
+        else:
+            pre_node.append(node)
+    is_chosen = np.zeros(shape=(len(pre_node)))
+    is_chosen[0] = 1
+    distance_matrix = build_distance_matrix(pre_node)
+    edge1 = prime(pre_node, distance_matrix, is_chosen)
+
+
+    distance_matrix = build_distance_matrix(nodes)
+    # Prim算法构建生成树
+    is_chosen = np.zeros(shape=(len(nodes)))
+    for node in pre_node:
+        is_chosen[node.index] = 1
+    edges2 = prime(nodes, distance_matrix, is_chosen)
+    for eg in edges2:
+        edge1.append(eg)
+    draw_line(nodes, edge1)
+    i, ii, sum_ = compute_length(edge1)
     print(i, ii, sum_)
 
 

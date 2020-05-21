@@ -264,5 +264,9 @@ def main():
     print(i, ii, sum_)
 
 
+#     找出能源不足的二级供水站
+#     for
+
+
 if __name__ == '__main__':
     main()
