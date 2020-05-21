@@ -169,9 +169,18 @@ def get_shortest_edge(nodes, distance_matrix, is_chosen):
     edge = Edge(nodes[min_start], nodes[min_end])
     return edge, min_end
 
+
 # 计算管道长度
-def compute_length(eages):
-    pass
+def compute_length(edges):
+    len_pip_type_I = 0
+    len_pip_type_II = 0
+    for eg in edges:
+        if eg.pip_type == PIP_TYPE_I:
+            len_pip_type_I += eg.distance
+        else:
+            len_pip_type_II += eg.distance
+    return len_pip_type_I, len_pip_type_II, len_pip_type_I + len_pip_type_II
+
 
 if __name__ == '__main__':
     nodes = read_data()
@@ -200,7 +209,6 @@ if __name__ == '__main__':
             distance_matrix[index, end] = MAX_LENGTH
             distance_matrix[end, index] = MAX_LENGTH
         # print("matrix after = {}".format(distance_matrix))
-
 
     draw_line(nodes, edges)
     compute_length(edges)
