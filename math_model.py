@@ -9,6 +9,7 @@ NODE_TYPE_P = "P"
 PIP_TYPE_I = "I"
 PIP_TYPE_II = "II"
 MAX_LENGTH = float("inf")
+np.set_printoptions(linewidth=400)
 
 
 class Node:
@@ -155,17 +156,17 @@ def get_shortest_edge(nodes, distance_matrix, is_chosen):
     min_length = MAX_LENGTH
 
     # 找出已被选择的所有节点的下标
-    chosen_index = np.argwhere(is_chosen == 1)
-    for index in chosen_index:
-        row = distance_matrix[index][0]
+    for index in range(len(nodes)):
+        if is_chosen[index] == 0:
+            continue
+        row = distance_matrix[index]
         # print("row = {}".format(row))
-        min_distance_in_row = np.min(row)
-        if min_distance_in_row < min_length:
-            min_end = int(np.argwhere(row == min_distance_in_row)[0])
-            min_start = index[0]
-            min_length = min_distance_in_row
-    # print("min_start = {}".format(min_start))
-    # print("min_end = {}".format(min_end))
+        for index_row, num_row in enumerate(row):
+            if num_row < min_length:
+                min_end = index_row
+                min_start = index
+                min_length = num_row
+
     edge = Edge(nodes[min_start], nodes[min_end])
     return edge, min_end
 
@@ -182,7 +183,7 @@ def compute_length(edges):
     return len_pip_type_I, len_pip_type_II, len_pip_type_I + len_pip_type_II
 
 
-if __name__ == '__main__':
+def main():
     nodes = read_data()
     distance_matrix = build_distance_matrix(nodes)
     print("max = {}".format(distance_matrix))
@@ -208,7 +209,11 @@ if __name__ == '__main__':
         for index in chosen_index:
             distance_matrix[index, end] = MAX_LENGTH
             distance_matrix[end, index] = MAX_LENGTH
-        # print("matrix after = {}".format(distance_matrix))
 
     draw_line(nodes, edges)
-    compute_length(edges)
+    i, ii, sum_ = compute_length(edges)
+    print(i, ii, sum_)
+
+
+if __name__ == '__main__':
+    main()
