@@ -1,3 +1,4 @@
+
 import numpy as np
 import math
 import re
@@ -39,60 +40,6 @@ class Edge:
         else:
             assert "供水方向错误"
         self.distance = compute_distance(start_node, end_node)
-
-
-def draw_line(nodes, edges):
-    for eg in edges:
-        x = [eg.start_node.node_x, eg.end_node.node_x]
-        y = [eg.start_node.node_y, eg.end_node.node_y]
-        color = 'r'
-        if eg.pip_type == PIP_TYPE_II:
-            color = 'b'
-        plt.plot(np.array(x), np.array(y), color)
-    center_nodes = []
-    I_nodes = []
-    II_nodes = []
-    for node in nodes:
-        # NODE_TYPE_A = "A"
-        # NODE_TYPE_V = "V"
-        # NODE_TYPE_P = "P"
-        if NODE_TYPE_A in node.node_type:
-            center_nodes.append(node)
-        if NODE_TYPE_V in node.node_type:
-            I_nodes.append(node)
-        if NODE_TYPE_P in node.node_type:
-            II_nodes.append(node)
-
-    # 画中心供水站
-    x = []
-    y = []
-    for node in center_nodes:
-        x.append(node.node_x)
-        y.append(node.node_y)
-    x = np.array(x)
-    y = np.array(y)
-    plt.scatter(x, y, c='r', s=5, linewidth=5)
-
-    # 画中心一级供水站
-    x = []
-    y = []
-    for node in I_nodes:
-        x.append(node.node_x)
-        y.append(node.node_y)
-    x = np.array(x)
-    y = np.array(y)
-    plt.scatter(x, y)
-
-    # 画中心二级供水站
-    x = []
-    y = []
-    for node in II_nodes:
-        x.append(node.node_x)
-        y.append(node.node_y)
-    x = np.array(x)
-    y = np.array(y)
-    plt.scatter(x, y)
-    plt.show()
 
 
 # 读取数据文件，创建节点列表
@@ -169,9 +116,6 @@ def get_shortest_edge(nodes, distance_matrix, is_chosen):
     edge = Edge(nodes[min_start], nodes[min_end])
     return edge, min_end
 
-# 计算管道长度
-def compute_length(eages):
-    pass
 
 if __name__ == '__main__':
     nodes = read_data()
@@ -201,6 +145,55 @@ if __name__ == '__main__':
             distance_matrix[end, index] = MAX_LENGTH
         # print("matrix after = {}".format(distance_matrix))
 
+    for eg in edges:
+        x = [eg.start_node.node_x, eg.end_node.node_x]
+        y = [eg.start_node.node_y, eg.end_node.node_y]
+        color = 'r'
+        if eg.pip_type == PIP_TYPE_II:
+            color = 'b'
+        plt.plot(np.array(x), np.array(y), color)
+    center_nodes = []
+    I_nodes = []
+    II_nodes = []
+    for node in nodes:
+        # NODE_TYPE_A = "A"
+        # NODE_TYPE_V = "V"
+        # NODE_TYPE_P = "P"
+        if NODE_TYPE_A in node.node_type:
+            center_nodes.append(node)
+        if NODE_TYPE_V in node.node_type:
+            I_nodes.append(node)
+        if NODE_TYPE_P in node.node_type:
+            II_nodes.append(node)
 
-    draw_line(nodes, edges)
-    compute_length(edges)
+    # 画中心供水站
+    x = []
+    y = []
+    for node in center_nodes:
+        x.append(node.node_x)
+        y.append(node.node_y)
+    x = np.array(x)
+    y = np.array(y)
+    plt.scatter(x, y, c='r', s=5, linewidth=5)
+
+    # 画中心一级供水站
+    x = []
+    y = []
+    for node in I_nodes:
+        x.append(node.node_x)
+        y.append(node.node_y)
+    x = np.array(x)
+    y = np.array(y)
+    plt.scatter(x, y)
+
+    # 画中心二级供水站
+    x = []
+    y = []
+    for node in II_nodes:
+        x.append(node.node_x)
+        y.append(node.node_y)
+    x = np.array(x)
+    y = np.array(y)
+    plt.scatter(x, y)
+
+    plt.show()
