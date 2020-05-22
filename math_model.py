@@ -1,3 +1,5 @@
+from time import time
+
 import numpy as np
 import math
 import re
@@ -74,16 +76,6 @@ def draw_line(nodes, edges):
     y = np.array(y)
     plt.scatter(x, y, c='r', s=5, linewidth=5)
 
-    # 画中心一级供水站
-    x = []
-    y = []
-    for node in I_nodes:
-        x.append(node.node_x)
-        y.append(node.node_y)
-    x = np.array(x)
-    y = np.array(y)
-    plt.scatter(x, y)
-
     # 画中心二级供水站
     x = []
     y = []
@@ -92,7 +84,21 @@ def draw_line(nodes, edges):
         y.append(node.node_y)
     x = np.array(x)
     y = np.array(y)
+    plt.scatter(x, y, c='g', s=2, linewidth=2)
     plt.scatter(x, y)
+
+    # 画中心一级供水站
+    x = []
+    y = []
+    for node in I_nodes:
+        x.append(node.node_x)
+        y.append(node.node_y)
+    x = np.array(x)
+    y = np.array(y)
+    plt.scatter(x, y, c='y', s=4, linewidth=4)
+    plt.scatter(x, y)
+    tims = time()
+    # plt.savefig('{}.jpg'.format("row"))
     plt.show()
 
 
@@ -151,17 +157,20 @@ def build_distance_matrix(nodes):
 
 # 获取最短边,和被选出的node的下标
 def get_shortest_edge(nodes, distance_matrix, is_chosen):
-    min_start = 0
-    min_end = 0
+    min_start = -1
+    min_end = -1
     min_length = MAX_LENGTH
 
-    # 找出已被选择的所有节点的下标
     for index in range(len(nodes)):
+        # 边的起点在已生成的树中早
         if is_chosen[index] == 0:
             continue
         row = distance_matrix[index]
         # print("row = {}".format(row))
         for index_row, num_row in enumerate(row):
+            # index_row对应的节点已经被选择过，不能作为新找的边
+            if is_chosen[index_row] == 1:
+                continue
             if num_row < min_length:
                 min_end = index_row
                 min_start = index
@@ -187,22 +196,80 @@ def prime(nodes, distance_matrix, is_chosen):
     # 选择供水中心作为开始节点
     edges = []
     # 并不是所有node都被选中
-    print("distance_matrix{}".format(distance_matrix))
+    # print("distance_matrix{}".format(distance_matrix))
     while not is_chosen.all():
-        print("is_chosen = {}".format(is_chosen.sum()))
+        # print("is_chosen = {}".format(is_chosen.sum()))
         edge, end = get_shortest_edge(nodes, distance_matrix, is_chosen)
         edges.append(edge)
         # print("eg.start_node = {},{},{}".format(edge.start_node.index, edge.end_node.index, edge.distance))
         is_chosen[end] = 1
         # 集合内部的距离设置为max
-        chosen_index = np.argwhere(is_chosen == 1)
-        for index in chosen_index:
-            distance_matrix[index, end] = MAX_LENGTH
-            distance_matrix[end, index] = MAX_LENGTH
+
     return edges
 
 
-def main():
+def compute_tree(nodes, is_draw):
+    pre_node = []
+    for node in nodes:
+        if NODE_TYPE_P in node.node_type:
+            continue
+        else:
+            pre_node.append(node)
+    is_chosen = np.zeros(shape=(len(pre_node)))
+    is_chosen[0] = 1
+    distance_matrix = build_distance_matrix(pre_node)
+    edge1 = prime(pre_node, distance_matrix, is_chosen)
+
+    # 已选出的边更新权重
+    distance_matrix = build_distance_matrix(nodes)
+    # Prim算法构建生成树
+    is_chosen = np.zeros(shape=(len(nodes)))
+    for node in pre_node:
+        is_chosen[node.index] = 1
+    edges2 = prime(nodes, distance_matrix, is_chosen)
+    for eg in edges2:
+        edge1.append(eg)
+    if is_draw:
+        draw_line(nodes, edge1)
+    i, ii, sum_ = compute_length(edge1)
+    return i, ii, sum_
+
+
+def main_1():
+    nodes = read_data()
+    i, ii, sum_ = compute_tree(nodes, True)
+    print(i, ii, sum_)
+
+
+def main_2():
+    nodes = read_data()
+    i, ii, sum_ = compute_tree(nodes, False)
+    min_ii_distance_1 = ii
+    min_ii_distance_2 = min_ii_distance_1
+    index_1 = -1
+    index_2 = -1
+
+    for i1 in np.arange(len(nodes)):
+        for i2 in np.arange(start=i1 + 1, stop=len(nodes), step=1):
+            #
+            # ran = np.random.random(size=(1, 2))
+            # if ran[0][1] > 0.005:
+            #     continue
+            if NODE_TYPE_P in nodes[i1].node_type and NODE_TYPE_P in nodes[i2].node_type:
+                nodes[i1].node_type = NODE_TYPE_V
+                nodes[i2].node_type = NODE_TYPE_V
+                i_2, ii_2, sum_2 = compute_tree(nodes, False)
+                if ii_2 < min_ii_distance_2:
+                    min_ii_distance_2 = ii_2
+                    index_1 = i1
+                    index_2 = i2
+                    print("current min i1 = {},i2 = {},dis = {}".format(i1, i2, min_ii_distance_2))
+                nodes[i1].node_type = NODE_TYPE_P
+                nodes[i2].node_type = NODE_TYPE_P
+    print("index_1 = {},index_2 ={},min_ii_distance_2={}".format(index_1, index_2, min_ii_distance_2))
+
+
+def main_2_2():
     nodes = read_data()
     pre_node = []
     for node in nodes:
@@ -215,7 +282,7 @@ def main():
     distance_matrix = build_distance_matrix(pre_node)
     edge1 = prime(pre_node, distance_matrix, is_chosen)
 
-
+    # 已选出的边更新权重
     distance_matrix = build_distance_matrix(nodes)
     # Prim算法构建生成树
     is_chosen = np.zeros(shape=(len(nodes)))
@@ -224,10 +291,27 @@ def main():
     edges2 = prime(nodes, distance_matrix, is_chosen)
     for eg in edges2:
         edge1.append(eg)
-    draw_line(nodes, edge1)
+    # 计算管道整体情况
     i, ii, sum_ = compute_length(edge1)
-    print(i, ii, sum_)
+    # 查找二型管道中最大和次大的管道
+    max_length = 0
+    max_eg = None
+    second_max_eg = None
+    for eg in edge1:
+        if eg.pip_type ==PIP_TYPE_I:
+            # 一型管道不用管
+            continue
+        if eg.distance>max_length:
+            second_max_eg = max_eg
+            max_length = eg.distance
+            max_eg = eg
+    print("II型管道：{}".format(ii))
+    print("次大二型管道：{}".format(second_max_eg.distance))
+    print("最大二型管道：{}".format(max_eg.distance))
+    print("减少距离：{}".format(ii-max_eg.distance-second_max_eg.distance))
+
+
 
 
 if __name__ == '__main__':
-    main()
+    main_2_2()

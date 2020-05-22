@@ -11,16 +11,18 @@ class Edge:
 def zhuliu(edges, n, m, root):
     res = 0
     while True:
-        pre = [-1]*n
+        pre = [-1] * n
         visited = [-1] * n
         circle = []
         inderee = [INF] * n
+        inderee_index = []
         # 寻找最小入边
         inderee[root] = 0
         for i in range(m):
             if edges[i].u != edges[i].v and edges[i].w < inderee[edges[i].v]:
                 pre[edges[i].v] = edges[i].u
                 inderee[edges[i].v] = edges[i].w
+                inderee_index.append(edges[i])
         # 有孤立点，不存在最小树形图
         for i in range(n):
             if i != root and inderee[i] == INF:
@@ -62,7 +64,7 @@ def zhuliu(edges, n, m, root):
                 edges[i].w -= inderee[v]
         n = tn
         root = circle[root]
-    return res
+    return res, inderee_index
 
 
 INF = 9999999999
@@ -72,6 +74,9 @@ if __name__ == '__main__':
     for i in range(m):
         u, v, w = list(map(int, input().split()))
         # 输入的点是1开始的，-1改为0开始的
-        edges.append(Edge(u-1, v-1, w))
-    print(zhuliu(edges, n, m, root-1),end = "")
-
+        edges.append(Edge(u - 1, v - 1, w))
+    zhuliu_result = zhuliu(edges, n, m, root - 1)
+    print(zhuliu_result[0], end="")
+    edges = zhuliu_result[1]
+    for eg in edges:
+        print("eg = {},{},{}".format(eg.u, eg.v, eg.w))

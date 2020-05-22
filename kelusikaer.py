@@ -260,12 +260,14 @@ def main():
         edges.append(e)
 
     draw_line(nodes, edges)
+    chu_dgree = np.zeros(shape=(len(edges)))
+    for eeg in edges:
+        chu_dgree[eeg.start_node.index] = eeg.distance + chu_dgree[eeg.start_node.index]
+    for item in chu_dgree:
+        print("item = {}".format(item))
     i, ii, sum_ = compute_length(edges)
     print(i, ii, sum_)
 
-
-#     找出能源不足的二级供水站
-#     for
 
 
 if __name__ == '__main__':
