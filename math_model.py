@@ -208,6 +208,32 @@ def prime(nodes, distance_matrix, is_chosen):
     return edges
 
 
+def get_edges(nodes, is_draw):
+    pre_node = []
+    for node in nodes:
+        if NODE_TYPE_P in node.node_type:
+            continue
+        else:
+            pre_node.append(node)
+    is_chosen = np.zeros(shape=(len(pre_node)))
+    is_chosen[0] = 1
+    distance_matrix = build_distance_matrix(pre_node)
+    edge1 = prime(pre_node, distance_matrix, is_chosen)
+
+    # 已选出的边更新权重
+    distance_matrix = build_distance_matrix(nodes)
+    # Prim算法构建生成树
+    is_chosen = np.zeros(shape=(len(nodes)))
+    for node in pre_node:
+        is_chosen[node.index] = 1
+    edges2 = prime(nodes, distance_matrix, is_chosen)
+    for eg in edges2:
+        edge1.append(eg)
+    if is_draw:
+        draw_line(nodes, edge1)
+    return edge1
+
+
 def compute_tree(nodes, is_draw):
     pre_node = []
     for node in nodes:
@@ -241,6 +267,7 @@ def main_1():
     print(i, ii, sum_)
 
 
+# 暴力法，弃用
 def main_2():
     nodes = read_data()
     i, ii, sum_ = compute_tree(nodes, False)
@@ -298,20 +325,29 @@ def main_2_2():
     max_eg = None
     second_max_eg = None
     for eg in edge1:
-        if eg.pip_type ==PIP_TYPE_I:
+        if eg.pip_type == PIP_TYPE_I:
             # 一型管道不用管
             continue
-        if eg.distance>max_length:
+        if eg.distance > max_length:
             second_max_eg = max_eg
             max_length = eg.distance
             max_eg = eg
     print("II型管道：{}".format(ii))
-    print("次大二型管道：{}".format(second_max_eg.distance))
-    print("最大二型管道：{}".format(max_eg.distance))
-    print("减少距离：{}".format(ii-max_eg.distance-second_max_eg.distance))
+    print("最长二型管道：{}->{} = {}".format(max_eg.start_node.node_type, max_eg.end_node.node_type, max_eg.distance))
+    print("次大二型管道：{}->{}={}".format(second_max_eg.start_node.node_type, second_max_eg.end_node.node_type,
+                                    second_max_eg.distance))
+    print("修改点1：{}".format(max_eg.end_node.node_type))
+    print("修改点2：{}".format(second_max_eg.end_node.node_type))
+    print("减少距离：{}".format(ii - max_eg.distance - second_max_eg.distance))
 
 
+# 获取某条边在边集合中的下标
+# def get_index_in_edges(eg, edges):
+#     for index in range(len(edges)):
+#         if edges[index].start_node.index == eg.index:
+#             return index
+#     return None
 
 
 if __name__ == '__main__':
-    main_2_2()
+    main_1()
