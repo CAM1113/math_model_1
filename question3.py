@@ -325,6 +325,8 @@ def get_father_edges(pre_node, edges):
     return edges
 
 
+
+
 def is_over(category_list):
     if (category_list == 0).any():
         return False
@@ -411,7 +413,11 @@ def compute_length(edges):
 def main_3():
     nodes = read_data()
     # 89,  94,  95, 109 4个点是离群点
-    nodes[89].node_type = "V89"
+    # 94：633.2633195813704
+    # 89：633.2075
+    # 95：635.6650738323617
+    # 109：632.5095308326057
+    nodes[109].node_type = "V109"
     pre_nodes = []
     for node in nodes:
         if NODE_TYPE_P in node.node_type:
@@ -420,6 +426,9 @@ def main_3():
             print(node.node_type)
             pre_nodes.append(node)
 
+
+    for i in range(len(nodes)):
+        nodes[i].index = i
     # 创建以一级节点为根节点的子树
     edges = get_edges(nodes, pre_nodes, True)
     # 将中心节点和一级节点创建子树
@@ -433,7 +442,9 @@ def main_3():
     print("二型管道：{}".format(ii))
     print("总管道：{}".format(sum_))
     for node in pre_nodes:
-        print("一型管道{}长度={}".format(node.node_type, compute_length_from_node(node, edges2)))
+        if NODE_TYPE_A in node.node_type:
+            continue
+        print("{}出发的管道长度={}".format(node.node_type, compute_length_from_node(node, edges2)))
 
 
 if __name__ == '__main__':

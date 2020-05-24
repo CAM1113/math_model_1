@@ -72,7 +72,7 @@ def draw_line(nodes, edges):
         y.append(node.node_y)
     x = np.array(x)
     y = np.array(y)
-    plt.scatter(x, y, c='r', s=5, linewidth=5)
+    plt.scatter(x, y, c='k', s=5, linewidth=5)
 
     # 画中心二级供水站
     x = []
@@ -82,6 +82,7 @@ def draw_line(nodes, edges):
         y.append(node.node_y)
     x = np.array(x)
     y = np.array(y)
+    plt.scatter(x, y, c='g', s=2, linewidth=2)
     plt.scatter(x, y)
 
     # 画中心一级供水站
@@ -92,6 +93,7 @@ def draw_line(nodes, edges):
         y.append(node.node_y)
     x = np.array(x)
     y = np.array(y)
+    plt.scatter(x, y, c='y', s=4, linewidth=4)
     plt.scatter(x, y)
     plt.show()
 

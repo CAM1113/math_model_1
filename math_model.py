@@ -74,7 +74,7 @@ def draw_line(nodes, edges):
         y.append(node.node_y)
     x = np.array(x)
     y = np.array(y)
-    plt.scatter(x, y, c='r', s=5, linewidth=5)
+    plt.scatter(x, y, c='k', s=5, linewidth=5)
 
     # 画中心二级供水站
     x = []
@@ -97,8 +97,6 @@ def draw_line(nodes, edges):
     y = np.array(y)
     plt.scatter(x, y, c='y', s=4, linewidth=4)
     plt.scatter(x, y)
-    tims = time()
-    # plt.savefig('{}.jpg'.format("row"))
     plt.show()
 
 
@@ -338,7 +336,8 @@ def main_2_2():
                                     second_max_eg.distance))
     print("修改点1：{}".format(max_eg.end_node.node_type))
     print("修改点2：{}".format(second_max_eg.end_node.node_type))
-    print("减少距离：{}".format(ii - max_eg.distance - second_max_eg.distance))
+    print("减少的二型管道距离：{}".format(max_length,second_max_eg))
+    print("减少后二型管道距离：{}".format(ii - max_eg.distance - second_max_eg.distance))
 
 
 # 获取某条边在边集合中的下标
@@ -350,4 +349,4 @@ def main_2_2():
 
 
 if __name__ == '__main__':
-    main_1()
+    main_2_2()
